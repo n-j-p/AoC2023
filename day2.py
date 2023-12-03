@@ -17,23 +17,16 @@ def parse_input(input_line):
     return moves_split2
 
 
-def check_move_possible(amove):
-    possible = True
-    max_cubes = {'red': 12,
-                 'green': 13,
-                 'blue': 14}
-    for col in max_cubes.keys():
-        try:
-            possible = possible & (amove[col] <= max_cubes[col])
-        except KeyError:
-            pass
-    return possible
-
-def check_game_possible(agame):
+def minimal_set(agame):
+    minimals = {'red': 0, 'green': 0, 'blue': 0}
     for move in game:
-        if not check_move_possible(move):
-            return False
-    return True
+        for col in move.keys():
+            minimals[col] = max(move[col], minimals[col])
+    return minimals
+
+def power(minimals):
+    p = minimals['red'] * minimals['green'] * minimals['blue']
+    return p
 
 c = 0
 
@@ -47,10 +40,9 @@ for i, row in enumerate(input):
             move[y[1]] = int(y[0])
         game.append(move)
     print(f'Game {i+1}:',game)
-    poss = check_game_possible(game)
-    print('  ',poss)
-    if poss:
-        c += i+1
+    game_power = power(minimal_set(game))
+    print('  ',game_power)
+    c += game_power
 
 print(c)
     
