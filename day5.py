@@ -1,4 +1,8 @@
+from tqdm import tqdm
+
 fpath = './day5_input.txt'
+
+TESTING = False
 
 example_input = ['seeds: 79 14 55 13',
                  '',
@@ -52,13 +56,19 @@ class Map():
                 return dest[0] + delta
         return x
 
-#seeds = [int(x) for x in example_input[0].split(':')[1].split()]
-seeds = [int(x) for x in actual_input[0].split(':')[1].split()]
+if TESTING:
+    seeds = [int(x) for x in example_input[0].split(':')[1].split()]
+else:
+    seeds = [int(x) for x in actual_input[0].split(':')[1].split()]
 
 # Create maps:
 maps = []
-#for row in example_input[2:]:
-for row in actual_input[2:]:
+if TESTING:
+    map_input = example_input[2:]
+else:
+    map_input = actual_input[2:]
+
+for row in map_input:
     if 'map' in row:
         input_rows = []
         continue
@@ -81,3 +91,23 @@ print('\nlowest location =',lowest)
 if lowest == 10**12:
     print('  check')
 
+print('\n\n--- Part 2 ---')
+    
+lowest = 10**12
+
+total = sum(seeds[1::2])
+
+with tqdm(total=total) as pbar:
+    for start, length in zip(*[iter(seeds)]*2):
+        # Iteration two at a time courtesy of https://stackoverflow.com/a/16789869
+        for seed in range(start, start+length):
+            mapped = [seed,]
+            for map in maps:
+                mapped.append(map.f(mapped[-1]))
+            #print('Seed %d, soil %d, fertilizer %d, water %d, light %d, temperature %d, humidity %d, location %d' % tuple(mapped))
+            lowest = min(lowest, mapped[-1])
+            pbar.update(1)
+
+print('\nlowest location =',lowest)
+if lowest == 10**12:
+    print('  check')
