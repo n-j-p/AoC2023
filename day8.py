@@ -34,3 +34,41 @@ while True:
     if state == 'ZZZ':
         break
 print('\n',step)
+
+### Part 2 ###
+
+allstates = [x for x in states.keys() if x[-1] == 'A']
+
+print(f'{0}: {allstates}')
+step = 0
+Zs = [[] for _ in range(len(allstates))]
+brk = False
+while True:
+    for direction in lr:
+        step += 1
+        nxt = []
+        for i,state in enumerate(allstates):
+            nxtstate = states[allstates[i]][direction]
+            #print(nxtstate)
+            nxt.append(nxtstate)
+        print(f'{step}: {nxt}')
+        #print('  ',[x[-1] for x in nxt])
+        #print(''.join([x[-1] for x in nxt]))
+        if ''.join([x[-1] for x in nxt]) == 'Z'*len(allstates):
+            break
+        for i,x in enumerate(nxt):
+            if x[-1] == 'Z':
+                Zs[i].append(step)
+                
+        if sum([len(x)>0 for x in Zs]) == len(allstates):
+            brk = True
+            break
+        
+        allstates = list(nxt)
+    if brk:
+        break
+for x in Zs:
+    print(x)
+import math
+print('\n',math.lcm(*[x[0] for x in Zs]))
+
