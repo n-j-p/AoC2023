@@ -23,22 +23,38 @@ if testing:
 else:
     inp = actual_input
 
+def delta(row1, row2):
+    return sum([r1i != row2[i] for i,r1i in enumerate(row1)])
+
+r1 = '#.##..##.'
+r2 = '..##..##.'
+print(delta(r1, r2))
+print(delta('..####..#', r2))
+print(delta(r1, r1))
+
 def find_poss(pattern_):
     for i,row in enumerate(pattern_[1:]):
-        if pattern_[i] == row:
-            #print('possible',i,'-',i+1)
+        d = delta(pattern_[i], row)
+        if d < 2:
+            print('possible',i,'-',i+1, f'({d})')
             yield i
 
 def find_sym(pattern_, start):
+    d2 = 1
     for i in range(start,-1,-1):
         row = pattern_[i]
         try:
             reflected_row = pattern_[2*start - i + 1]
         except IndexError:
-            return True
-        if reflected_row != row:
+            break
+        d = delta(reflected_row, row)
+        if d > d2:
             return False
-    return True
+        d2 -= d
+    if d2 == 0:
+        return True
+    else:
+        return False
             
 def transpose(pattern_):
     return [''.join([x[i] for x in pattern_]) for i in range(len(pattern_[0]))]
