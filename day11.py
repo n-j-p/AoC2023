@@ -25,21 +25,21 @@ def find_zero_rows(pattern_):
         if '#' not in row:
             ans.append(i)
     return ans
-def xpand(pattern_):
+def xpand(pattern_, m=1):
     
     xpand_rows = find_zero_rows(pattern_)
     xpand_cols = find_zero_rows(transpose(pattern_))
 
     for i in xpand_rows[::-1]:
         pattern_ = pattern_[:i] + \
-            [pattern_[i],] * 2 + \
+            [pattern_[i],] * (m+1) + \
             pattern_[(i+1):]
     pattern_ = transpose(pattern_)
     for i in xpand_cols[::-1]:
         pattern_ = pattern_[:i] + \
-            [pattern_[i],] * 2 + \
+            [pattern_[i],] * (m+1) + \
             pattern_[(i+1):]
-    return transpose(pattern_)
+    return transpose(pattern_),xpand_rows,xpand_cols
 
 def get_hash_coords(pattern_):
     n = 0
@@ -63,7 +63,7 @@ for x in inp:
 print()
 print(list(get_hash_coords(inp)))
 print()
-expanded_input = xpand(list(inp))
+expanded_input, rows, cols = xpand(list(inp), 9)
 for x in expanded_input:
     print(x)
 print()
@@ -79,4 +79,26 @@ for xy in it.combinations(get_hash_coords(expanded_input),
 print()
 print(c)
 print()
-    
+
+
+import bisect
+
+multiplier = 10**6-1
+
+c = 0
+for xy in it.combinations(get_hash_coords(inp),
+                          r=2):
+    exp_xyx = list(xy[0])
+    expanded_x = list(xy[0])
+    expanded_y = list(xy[1])
+    expanded_x[1] += bisect.bisect(cols, expanded_x[1]) * multiplier
+    expanded_x[0] += bisect.bisect(rows, expanded_x[0]) * multiplier
+    expanded_y[1] += bisect.bisect(cols, expanded_y[1]) * multiplier
+    expanded_y[0] += bisect.bisect(rows, expanded_y[0]) * multiplier
+
+    print((expanded_x, expanded_y),
+          d(expanded_x, expanded_y))
+    c += d(expanded_x, expanded_y)
+
+print(c)
+#print(rows, cols)
