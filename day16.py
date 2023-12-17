@@ -11,15 +11,19 @@ example_input=['.|...V....',
                '.|....-|.V',
                '..//.|....']
 testing = False
+VERBOSE = False
 if testing:
     inp = example_input
 else:
     inp = open('./day16_input.txt').read().replace('\\','V').split('\n')[:-1]
 
+if VERBOSE:
+    for x in inp:
+        print(x)
+
 R = len(inp)
 C = len(inp[0])
 
-nrgised = set(())
 
 # Directions are: 0 = 'N', 1 = 'E', 2 = 'S', 3 = 'W'
 start = (0,0,1) # x pos, y pos, direction
@@ -86,7 +90,6 @@ def trace_beam(cur_):
 
         # Check if we have left the grid:
         if nxt[0] < 0 or nxt[0] >= R or nxt[1] < 0 or nxt[1] >= C:
-            print('left grid')
             break
 
         tnxt = tuple(nxt)
@@ -96,26 +99,39 @@ def trace_beam(cur_):
             return []
     return []
 
-Q = [start]
-print(Q)
-while len(Q) > 0:
-    cur = Q.pop(0)
-    print(cur)
-    split_beams = trace_beam(cur)
-    for beam in split_beams:
-        Q.append(beam)
+all_starts = []
+          # Left edge, heading E
+          # Top edge, heading S
+          # Right edge, heading W
+          # Bottom edge, heading N     
+all_starts = [(i,0,1) for i in range(R)] +\
+    [(0,i,2) for i in range(C)] +         \
+    [(i,C-1,3) for i in range(R)] +       \
+    [(R-1,i,0) for i in range(C)]             
+max_nrg = 0
+for start in all_starts:
+    nrgised = set(())
     
-# Output:
-for x in inp:
-    print(x)
-print()
-print(nrgised)
-#nrg_grid = [['.',]*C for _ in range(R)]
-nrg_grid = [list(x) for x in inp]
-for x in nrgised:
-    nrg_grid[x[0]][x[1]] = '#'
-for x in nrg_grid:
-    print(''.join(x))
+    Q = [start]
+    print(Q, end=': ')
+    while len(Q) > 0:
+        cur = Q.pop(0)
+        split_beams = trace_beam(cur)
+        for beam in split_beams:
+            Q.append(beam)
 
-print('\n',len(set([x[:2] for x in nrgised])))
-                                        
+    # Output:
+    if VERBOSE:
+        print()
+        #print(nrgised)
+        #nrg_grid = [['.',]*C for _ in range(R)]
+        nrg_grid = [list(x) for x in inp]
+        for x in nrgised:
+            nrg_grid[x[0]][x[1]] = '#'
+        for x in nrg_grid:
+            print(''.join(x))
+    nrg = len(set([x[:2] for x in nrgised]))
+    print(nrg)
+    max_nrg = max(nrg, max_nrg)
+
+print('\n',max_nrg)
